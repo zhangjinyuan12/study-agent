@@ -10,6 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from backend.tools import (  # noqa: E402
+    add_material_chunk,
     make_study_plan,
     query_tasks,
     query_wrong_questions,
@@ -57,6 +58,16 @@ def run_agent(message: str):
     available_hours = extract_available_hours(message)
     tool_calls = []
     answer_parts = []
+
+    if is_add_material_request(message):
+        input_args = parse_add_material_input(message, subject)
+        output_result = add_material_chunk(**input_args)
+        add_tool_call(tool_calls, "add_material_chunk", input_args, output_result)
+        answer_parts.append(build_add_material_answer(output_result, input_args))
+        return {
+            "answer": "\n\n".join(answer_parts),
+            "tool_calls": tool_calls,
+        }
 
     if "任务" in message:
         input_args = {"subject": subject}
@@ -125,6 +136,35 @@ def has_material_keyword(message: str):
     return extract_knowledge_keyword(message) is not None and has_learning_question_word(message)
 
 
+def is_add_material_request(message: str):
+    return "添加资料" in message or "加入资料库" in message or "保存到资料库" in message
+
+
+def parse_add_material_input(message: str, subject: str):
+    title = extract_field_value(message, "标题") or "未命名资料"
+    keyword = extract_field_value(message, "关键词") or title
+    content = extract_field_value(message, "内容") or ""
+
+    return {
+        "subject": subject,
+        "title": title,
+        "keyword": keyword,
+        "content": content,
+        "source_type": "user_added",
+        "pinned": 0,
+    }
+
+
+def extract_field_value(message: str, field_name: str):
+    pattern = rf"{field_name}\s*=\s*(.*?)(?:；|;|$)"
+    match = re.search(pattern, message)
+
+    if not match:
+        return ""
+
+    return match.group(1).strip()
+
+
 def extract_material_keyword(message: str, subject: str):
     keyword = extract_knowledge_keyword(message)
     return keyword or subject
@@ -179,6 +219,13 @@ def build_materials_answer(result, keyword):
 
     first = materials[0]
     return f"查询到 {len(materials)} 条与“{keyword}”相关的资料。重点资料是《{first['title']}》：{first['content']}"
+
+
+def build_add_material_answer(result, input_args):
+    if result.get("success"):
+        return f"资料已添加到资料库：{input_args['title']}，关键词：{input_args['keyword']}。"
+
+    return "资料添加失败，请检查输入格式。"
 
 
 def build_plan_answer(result, subject, available_hours):

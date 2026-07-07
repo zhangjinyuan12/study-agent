@@ -1,6 +1,7 @@
 import json
+import sqlite3
 
-from database import execute_query, execute_update
+from database import execute_query, execute_update, get_connection
 
 
 def query_tasks(subject=None, status=None):
@@ -59,18 +60,135 @@ def query_wrong_questions(subject=None):
 
 
 def search_materials(keyword):
-    """使用 LIKE 从学习资料内容中搜索关键词。"""
+    """优先从资料切块表检索，兼容旧 materials 表。"""
+    chunk_results = search_material_chunks(keyword)
+
+    if chunk_results:
+        return {
+            "matched_materials": chunk_results,
+        }
+
+    return search_legacy_materials(keyword)
+
+
+def search_material_chunks(keyword):
     sql = """
-        SELECT *
-        FROM materials
-        WHERE content LIKE ?
-        ORDER BY subject ASC, id ASC
+        SELECT id, title, subject, content, source_type
+        FROM material_chunks
+        WHERE title LIKE ? OR keyword LIKE ? OR content LIKE ?
+        ORDER BY
+            pinned DESC,
+            CASE
+                WHEN title = ? OR keyword = ? THEN 0
+                WHEN title LIKE ? OR keyword LIKE ? THEN 1
+                ELSE 2
+            END ASC,
+            use_count DESC,
+            id ASC
+        LIMIT 5
     """
-    matched_materials = execute_query(sql, (f"%{keyword}%",))
+    like_keyword = f"%{keyword}%"
+
+    try:
+        matched_chunks = execute_query(
+            sql,
+            (
+                like_keyword,
+                like_keyword,
+                like_keyword,
+                keyword,
+                keyword,
+                like_keyword,
+                like_keyword,
+            ),
+        )
+    except sqlite3.OperationalError:
+        return []
+
+    for chunk in matched_chunks:
+        execute_update(
+            """
+            UPDATE material_chunks
+            SET use_count = use_count + 1,
+                last_accessed = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (chunk["id"],),
+        )
+
+    return matched_chunks
+
+
+def search_legacy_materials(keyword):
+    sql = """
+        SELECT id, title, subject, content
+        FROM materials
+        WHERE title LIKE ? OR content LIKE ?
+        ORDER BY subject ASC, id ASC
+        LIMIT 5
+    """
+    like_keyword = f"%{keyword}%"
+    matched_materials = execute_query(sql, (like_keyword, like_keyword))
+
+    for material in matched_materials:
+        material["source_type"] = "seed"
 
     return {
         "matched_materials": matched_materials,
     }
+
+
+def add_material_chunk(subject, title, keyword, content, source_type="user_added", pinned=0):
+    """向 material_chunks 表新增一条资料片段。"""
+    ensure_material_chunks_table()
+
+    sql = """
+        INSERT INTO material_chunks
+        (material_id, subject, title, keyword, content, source_type, pinned, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    """
+    params = (
+        None,
+        subject,
+        title,
+        keyword,
+        content,
+        source_type,
+        pinned,
+    )
+
+    with get_connection() as connection:
+        cursor = connection.execute(sql, params)
+        connection.commit()
+        chunk_id = cursor.lastrowid
+
+    return {
+        "success": True,
+        "message": "资料已添加",
+        "chunk_id": chunk_id,
+    }
+
+
+def ensure_material_chunks_table():
+    with get_connection() as connection:
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS material_chunks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                material_id INTEGER,
+                subject TEXT,
+                title TEXT,
+                keyword TEXT,
+                content TEXT,
+                source_type TEXT,
+                use_count INTEGER DEFAULT 0,
+                last_accessed TEXT,
+                pinned INTEGER DEFAULT 0,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+        connection.commit()
 
 
 def make_study_plan(subject, available_hours):
@@ -156,5 +274,14 @@ if __name__ == "__main__":
     print("\n3. search_materials('B+树')")
     print(json.dumps(search_materials("B+树"), ensure_ascii=False, indent=2))
 
-    print("\n4. make_study_plan('数据结构', 3)")
+    print("\n4. search_materials('KMP')")
+    print(json.dumps(search_materials("KMP"), ensure_ascii=False, indent=2))
+
+    print("\n5. search_materials('哈希表')")
+    print(json.dumps(search_materials("哈希表"), ensure_ascii=False, indent=2))
+
+    print("\n6. search_materials('最短路径')")
+    print(json.dumps(search_materials("最短路径"), ensure_ascii=False, indent=2))
+
+    print("\n7. make_study_plan('数据结构', 3)")
     print(json.dumps(make_study_plan("数据结构", 3), ensure_ascii=False, indent=2))

@@ -11,6 +11,7 @@ def create_tables(connection):
     cursor = connection.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS tool_logs")
+    cursor.execute("DROP TABLE IF EXISTS material_chunks")
     cursor.execute("DROP TABLE IF EXISTS materials")
     cursor.execute("DROP TABLE IF EXISTS wrong_questions")
     cursor.execute("DROP TABLE IF EXISTS tasks")
@@ -50,6 +51,24 @@ def create_tables(connection):
             subject TEXT NOT NULL,
             title TEXT NOT NULL,
             content TEXT NOT NULL
+        )
+        """
+    )
+
+    cursor.execute(
+        """
+        CREATE TABLE material_chunks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            material_id INTEGER,
+            subject TEXT,
+            title TEXT,
+            keyword TEXT,
+            content TEXT,
+            source_type TEXT,
+            use_count INTEGER DEFAULT 0,
+            last_accessed TEXT,
+            pinned INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
