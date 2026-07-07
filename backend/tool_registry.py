@@ -61,5 +61,50 @@ TOOLS = [
             "message": "操作提示。",
             "chunk_id": "新增资料片段 id。"
         }
+    },
+    {
+        "name": "add_wrong_question",
+        "description": "向错题本新增一条错题记录。",
+        "parameters": {
+            "subject": "必填，科目，例如：数据结构。",
+            "knowledge_point": "必填，知识点，例如：红黑树。",
+            "question": "必填，错题内容。",
+            "reason": "必填，错误原因。"
+        },
+        "returns": {
+            "success": "是否添加成功。",
+            "message": "操作提示。",
+            "wrong_question_id": "新增错题 id。"
+        }
+    },
+    {
+        "name": "add_task",
+        "description": "新增一条学习任务。",
+        "parameters": {
+            "subject": "必填，科目，例如：数据结构。",
+            "title": "必填，任务标题。",
+            "description": "可选，任务描述。",
+            "status": "可选，任务状态，默认未完成。",
+            "priority": "可选，优先级，默认 3。",
+            "due_date": "可选，截止日期。"
+        },
+        "returns": {
+            "success": "是否添加成功。",
+            "message": "操作提示。",
+            "task_id": "新增任务 id。"
+        }
+    },
+    {
+        "name": "update_task_status",
+        "description": "根据任务标题更新任务状态。",
+        "parameters": {
+            "title": "必填，任务标题。",
+            "status": "必填，任务状态，例如：已完成、未完成。"
+        },
+        "returns": {
+            "success": "是否更新成功。",
+            "message": "操作提示。",
+            "updated_count": "更新的任务数量。"
+        }
     }
 ]

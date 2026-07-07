@@ -169,6 +169,102 @@ def add_material_chunk(subject, title, keyword, content, source_type="user_added
     }
 
 
+def add_wrong_question(subject, knowledge_point, question, reason):
+    """向 wrong_questions 表新增一条错题记录。"""
+    try:
+        sql = """
+            INSERT INTO wrong_questions
+            (subject, question_title, knowledge_point, difficulty, mistake_reason, created_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        """
+
+        with get_connection() as connection:
+            cursor = connection.execute(
+                sql,
+                (
+                    subject,
+                    question,
+                    knowledge_point,
+                    "",
+                    reason,
+                ),
+            )
+            connection.commit()
+            wrong_question_id = cursor.lastrowid
+
+        return {
+            "success": True,
+            "message": "错题已添加",
+            "wrong_question_id": wrong_question_id,
+        }
+    except Exception as error:
+        return {
+            "success": False,
+            "message": "错题添加失败",
+            "error": str(error),
+        }
+
+
+def add_task(subject, title, description="", status="未完成", priority=3, due_date=""):
+    """向 tasks 表新增一条学习任务。"""
+    try:
+        sql = """
+            INSERT INTO tasks
+            (subject, title, description, status, priority, due_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """
+
+        with get_connection() as connection:
+            cursor = connection.execute(
+                sql,
+                (
+                    subject,
+                    title,
+                    description,
+                    status,
+                    int(priority),
+                    due_date,
+                ),
+            )
+            connection.commit()
+            task_id = cursor.lastrowid
+
+        return {
+            "success": True,
+            "message": "任务已添加",
+            "task_id": task_id,
+        }
+    except Exception as error:
+        return {
+            "success": False,
+            "message": "任务添加失败",
+            "error": str(error),
+        }
+
+
+def update_task_status(title, status):
+    """根据任务标题修改任务状态。"""
+    sql = """
+        UPDATE tasks
+        SET status = ?
+        WHERE title = ?
+    """
+    updated_count = execute_update(sql, (status, title))
+
+    if updated_count == 0:
+        return {
+            "success": False,
+            "message": "没有找到对应任务",
+            "updated_count": 0,
+        }
+
+    return {
+        "success": True,
+        "message": "任务状态已更新",
+        "updated_count": updated_count,
+    }
+
+
 def ensure_material_chunks_table():
     with get_connection() as connection:
         connection.execute(
