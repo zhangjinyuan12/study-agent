@@ -1,3 +1,4 @@
+/* ========== CSS 自定义属性（设计令牌） ========== */
 :root {
     --bg: #eef3f8;
     --surface: #ffffff;
@@ -14,20 +15,24 @@
     --radius: 8px;
 }
 
+/* ========== 全局重置 ========== */
 * {
     box-sizing: border-box;
 }
 
+/* ========== 页面主体（背景图 + 字体） ========== */
 body {
     margin: 0;
     min-height: 100vh;
     font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
     color: var(--text);
     background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
-        linear-gradient(135deg, #f7fbff 0%, var(--bg) 52%, #f3f7f5 100%);
+        url("images/IMG_20260707_102206.png") center / cover no-repeat;
+    /* fallback if the image fails to load */
+    background-color: var(--bg);
 }
 
+/* ========== 表单元素重置 ========== */
 button,
 input {
     font: inherit;
@@ -37,10 +42,16 @@ button {
     cursor: pointer;
 }
 
+/* ========== 应用根容器（毛玻璃背景遮罩） ========== */
 .app {
     min-height: 100vh;
+    overflow: hidden;
+    background: rgba(238, 243, 248, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
+/* ========== 顶部导航栏 ========== */
 .top-header {
     height: 82px;
     display: flex;
@@ -66,6 +77,7 @@ button {
     color: rgba(255, 255, 255, 0.82);
 }
 
+/* ========== Demo 模式徽标 ========== */
 .demo-badge {
     flex: 0 0 auto;
     padding: 8px 13px;
@@ -76,15 +88,17 @@ button {
     background: rgba(255, 255, 255, 0.14);
 }
 
+/* ========== 三栏主布局 ========== */
 .layout {
     display: grid;
     grid-template-columns: 220px minmax(0, 1fr) 330px;
     gap: 18px;
-    height: calc(100vh - 82px);
+    height: calc(100vh - 82px);  /* 减去顶部导航栏高度 */
     min-height: 620px;
     padding: 18px;
 }
 
+/* ========== 所有面板的统一边框与背景 ========== */
 .sidebar,
 .chat-panel,
 .feature-view,
@@ -92,10 +106,13 @@ button {
 .overview {
     border: 1px solid rgba(217, 226, 236, 0.86);
     border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--shadow);
 }
 
+/* ========== 左侧边栏（功能菜单导航） ========== */
 .sidebar {
     padding: 16px;
 }
@@ -105,6 +122,7 @@ button {
     gap: 10px;
 }
 
+/* ========== 菜单项按钮 ========== */
 .menu-item {
     width: 100%;
     min-height: 44px;
@@ -121,20 +139,32 @@ button {
 .menu-item.active {
     color: var(--primary);
     border-color: rgba(37, 99, 235, 0.16);
-    background: #eef5ff;
+    background: rgba(238, 245, 255, 0.70);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
+/* ========== 中间工作区（聊天面板 + 仪表盘） ========== */
 .workspace {
     min-width: 0;
+    min-height: 0;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     gap: 18px;
 }
 
+/* 功能模块视图下：取消下方面板占位和间隙，让中间栏填满高度 */
+.workspace--single {
+    grid-template-rows: 1fr;
+    gap: 0;
+}
+
+/* ========== 隐藏元素的工具类 ========== */
 .is-hidden {
     display: none !important;
 }
 
+/* ========== 智能问答聊天面板 ========== */
 .chat-panel {
     min-height: 0;
     padding: 18px;
@@ -143,17 +173,19 @@ button {
     gap: 14px;
 }
 
+/* ========== 功能模块视图（学习任务、错题分析等） ========== */
 .feature-view {
     min-height: 0;
     padding: 18px;
-    display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr);
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
 }
 
+/* ========== 功能模块回答显示区 ========== */
 .feature-answer {
-    min-height: 180px;
+    flex: 1;
+    min-height: 100px;
     overflow-y: auto;
     padding: 14px;
     border: 1px solid var(--line);
@@ -161,9 +193,11 @@ button {
     color: #263244;
     line-height: 1.7;
     white-space: pre-line;
-    background: linear-gradient(180deg, #fbfdff 0%, #f4f7fb 100%);
+    background: rgba(251, 253, 255, 0.55);
+    backdrop-filter: blur(4px);
 }
 
+/* ========== 资料检索搜索栏 ========== */
 .feature-search {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 88px;
@@ -177,7 +211,9 @@ button {
     border: 1px solid #cdd8e5;
     border-radius: var(--radius);
     color: var(--text);
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.80);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     outline: none;
 }
 
@@ -195,12 +231,14 @@ button {
     background: linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%);
 }
 
+/* ========== 测试用例按钮网格 ========== */
 .test-button-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
 
+/* ========== 面板标题栏 ========== */
 .panel-heading {
     display: flex;
     align-items: center;
@@ -222,13 +260,40 @@ button {
     font-size: 13px;
 }
 
+/* ========== 清空聊天按钮 ========== */
+.clear-chat-btn {
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid rgba(217, 226, 236, 0.86);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.clear-chat-btn:hover {
+    color: #dc2626;
+    border-color: #fca5a5;
+    background: rgba(254, 226, 226, 0.55);
+}
+
+/* ========== 聊天消息列表 ========== */
 .chat-messages {
-    min-height: 210px;
+    min-height: 0;
     overflow-y: auto;
     padding: 14px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    background: linear-gradient(180deg, #fbfdff 0%, #f4f7fb 100%);
+    background: rgba(251, 253, 255, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
 }
 
 .message {
@@ -241,6 +306,7 @@ button {
     margin-bottom: 0;
 }
 
+/* ========== 消息发送者头像 ========== */
 .message-role {
     width: 34px;
     height: 34px;
@@ -254,6 +320,7 @@ button {
     background: var(--primary);
 }
 
+/* ========== 用户消息（右侧显示） ========== */
 .user-message {
     flex-direction: row-reverse;
 }
@@ -262,6 +329,7 @@ button {
     background: #0f766e;
 }
 
+/* ========== 消息气泡 ========== */
 .message-bubble {
     max-width: min(680px, calc(100% - 44px));
     padding: 11px 13px;
@@ -269,7 +337,9 @@ button {
     color: #263244;
     line-height: 1.7;
     font-size: 14px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     border: 1px solid #e3e9f1;
     box-shadow: 0 8px 20px rgba(31, 42, 68, 0.08);
     white-space: pre-line;
@@ -278,9 +348,12 @@ button {
 .user-message .message-bubble {
     color: #ffffff;
     border-color: transparent;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.82) 0%, rgba(8, 145, 178, 0.82) 100%);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
+/* ========== 示例问题按钮区 ========== */
 .example-area {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -294,17 +367,20 @@ button {
     border-radius: var(--radius);
     color: #245178;
     text-align: left;
-    background: #f7fbff;
+    background: rgba(247, 251, 255, 0.75);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     transition: all 0.18s ease;
 }
 
 .example-button:hover {
     border-color: rgba(37, 99, 235, 0.42);
     color: var(--primary-dark);
-    background: #edf6ff;
+    background: rgba(237, 246, 255, 0.80);
     transform: translateY(-1px);
 }
 
+/* ========== 聊天输入栏 ========== */
 .chat-input-bar {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 86px;
@@ -318,7 +394,9 @@ button {
     border: 1px solid #cdd8e5;
     border-radius: var(--radius);
     color: var(--text);
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.80);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     outline: none;
 }
 
@@ -337,12 +415,14 @@ button {
     box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18);
 }
 
+/* ========== 仪表盘布局（统计卡片 + 学习概览） ========== */
 .dashboard {
     display: grid;
     grid-template-columns: minmax(260px, 1fr) minmax(300px, 1.05fr);
     gap: 18px;
 }
 
+/* ========== 统计卡片网格 ========== */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -354,7 +434,9 @@ button {
     padding: 15px;
     border: 1px solid rgba(217, 226, 236, 0.88);
     border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 12px 28px rgba(31, 42, 68, 0.09);
 }
 
@@ -372,6 +454,7 @@ button {
     color: #17325f;
 }
 
+/* ========== 学习情况概览 ========== */
 .overview {
     padding: 16px;
 }
@@ -403,6 +486,7 @@ button {
     border-radius: inherit;
 }
 
+/* ========== 各科进度条颜色 ========== */
 .fill-data-structure {
     width: 75%;
     background: linear-gradient(90deg, var(--primary) 0%, #06b6d4 100%);
@@ -418,6 +502,7 @@ button {
     background: linear-gradient(90deg, var(--warning) 0%, #f97316 100%);
 }
 
+/* ========== 右侧工具调用面板 ========== */
 .tool-panel {
     min-height: 0;
     padding: 18px;
@@ -435,11 +520,13 @@ button {
     padding-right: 4px;
 }
 
+/* ========== 工具调用卡片 ========== */
 .tool-card {
     padding: 14px;
     border: 1px solid #dae5f1;
     border-radius: var(--radius);
-    background: #fbfdff;
+    background: rgba(251, 253, 255, 0.50);
+    backdrop-filter: blur(4px);
     box-shadow: 0 10px 24px rgba(31, 42, 68, 0.08);
 }
 
@@ -463,9 +550,12 @@ button {
     border-radius: 999px;
     color: #166534;
     font-size: 12px;
-    background: #dcfce7;
+    background: rgba(220, 252, 231, 0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
+/* ========== 工具参数字段 ========== */
 .tool-field {
     margin-top: 9px;
 }
@@ -488,9 +578,12 @@ button {
     line-height: 1.5;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    background: #f4f7fb;
+    background: rgba(244, 247, 251, 0.78);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
+/* ========== JSON 原始数据查看区 ========== */
 .raw-json-section {
     display: grid;
     gap: 8px;
@@ -504,13 +597,17 @@ button {
     border-radius: var(--radius);
     color: #245178;
     font-size: 12px;
-    background: #f7fbff;
+    background: rgba(247, 251, 255, 0.75);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .raw-json-toggle:hover {
     border-color: rgba(37, 99, 235, 0.42);
     color: var(--primary-dark);
-    background: #edf6ff;
+    background: rgba(237, 246, 255, 0.70);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .raw-json {
@@ -527,13 +624,68 @@ button {
     line-height: 1.5;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    background: #f4f7fb;
+    background: rgba(244, 247, 251, 0.78);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .raw-json.open {
     display: block;
 }
 
+/* ========== Agent 模式选择器 ========== */
+.mode-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.mode-label {
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mode-toggle {
+    display: flex;
+    border: 1px solid #d7e2ef;
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.mode-btn {
+    min-height: 32px;
+    padding: 0 14px;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    background: rgba(247, 251, 255, 0.75);
+    transition: all 0.18s ease;
+    cursor: pointer;
+}
+
+.mode-btn:not(:last-child) {
+    border-right: 1px solid #d7e2ef;
+}
+
+.mode-btn.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%);
+}
+
+.mode-btn:hover:not(.active) {
+    color: var(--primary);
+    background: rgba(237, 246, 255, 0.80);
+}
+
+.mode-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========== 空状态占位提示 ========== */
 .empty-state {
     display: grid;
     min-height: 140px;
@@ -543,9 +695,12 @@ button {
     border-radius: var(--radius);
     color: var(--muted);
     text-align: center;
-    background: var(--surface-soft);
+    background: rgba(246, 248, 251, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
+/* ========== 响应式：<1180px 中等屏幕 ========== */
 @media (max-width: 1180px) {
     .layout {
         grid-template-columns: 190px minmax(0, 1fr);
@@ -559,6 +714,7 @@ button {
     }
 }
 
+/* ========== 响应式：<860px 平板 ========== */
 @media (max-width: 860px) {
     .top-header {
         height: auto;
@@ -598,6 +754,7 @@ button {
     }
 }
 
+/* ========== 响应式：<520px 手机 ========== */
 @media (max-width: 520px) {
     .top-header h1 {
         font-size: 22px;
